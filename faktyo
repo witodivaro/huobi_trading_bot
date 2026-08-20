@@ -1,0 +1,36 @@
+Last login: Thu Aug 20 09:57:46 on ttys001
+your work is yours to choose
+and the choice is as wide as your mind;
+nothing more is possible to you
+and nothing less is human
+––
+you must be able to articulate
+in extreme detail
+how a computer works
+v%                                                            huobi_trading_bot $ vim
+
+
+
+
+
+
+
+
+Эntitiyo
+        Эntiti A ("Trader")
+        Эntiti B ("Feedee")
+        Эntiti C ("Long")
+        Эntiti D ("Short")
+        Эntiti Э ("Order")
+        Эntiti F ("Has Эnough Balance")
+        Эntiti I ("Эrror")
+        Эntiti J ("HasOpenPositionsAndOrOrders")
+        Эntiti Q ("StopLoss")
+        Эntiti U ("OrderNotification")  
+
+Changeing
+        Changeing G ("syncShort")
+        Changeing H ("syncLong")
+        Changeing K ("openPositions")
+        Changeing L ("addListener")
+        Changeing M ("checkHasЭnoughBalance")

@@ -88,11 +88,23 @@ export class Trader {
     }
 
     if (!hasOpenPositionsOrAndOrders && hasEnoughBalance) {
-      await this.openPositions(latestPrice, margin_available, contract_size);
+	await this.openPositions(
+		latestPrice,
+		margin_available,
+		contract_size
+	);
     }
 
-    this._priceFeedee.addListener(this._priceChangeHandler as PriceListener);
-    this._orderFeedee.addListener(this._orderUpdateHandler as OrderListener);
+    this
+	._priceFeedee
+	.addListener(
+		this._priceChangeHandler as PriceListener
+	);
+    this
+	._orderFeedee
+	.addListener(
+		this._orderUpdateHandler as OrderListener
+	);
   }
 
   checkHasEnoughBalance({
@@ -101,11 +113,18 @@ export class Trader {
   }: AccountPositionsOrders) {
     const latestPrice = this.getLatestPrice();
 
-    return getHasEnoughBalance(margin_available, latestPrice, contract_size);
+    return getHasEnoughBalance(
+		margin_available,
+		latestPrice,
+		contract_size
+	);
   }
 
   getLatestPrice() {
-    const latestPrice = this._priceFeedee.getLatestPrice();
+    const latestPrice =
+		this
+			._priceFeedee
+			.getLatestPrice();
 
     if (!latestPrice) {
       throw new Error(
@@ -116,16 +135,25 @@ export class Trader {
     return latestPrice;
   }
 
-  async syncShort(order: AccountOrderPos) {
-    const initialStopLoss = calculateStopLoss(
-      order.entryPrice,
-      SHORT_STOP_LOSS_DEVIATION,
-      this._pricePrecision
-    );
+  	async syncShort(
+		order: AccountOrderPos
+	) {
+    	const initialStopLoss = calculateStopLoss(
+      		order.entryPrice,
+      		SHORT_STOP_LOSS_DEVIATION,
+      		this._pricePrecision
+    	);
 
-    this.short = Short.fromExisting(this._contractCode, order);
+	this.short =
+		Short.fromExisting(
+			this._contractCode,
+			order
+		);
 
-    if (order.state === PositionState.OPEN && !this.short.stopLossOrder) {
+    if (
+		order.state === PositionState.OPEN
+		&& !this.short.stopLossOrder
+	) {
       await this.short.placeStopLoss(initialStopLoss);
     }
 
@@ -142,7 +170,13 @@ export class Trader {
       LONG_STOP_LOSS_DEVIATION,
       this._pricePrecision
     );
-    this.long = Long.fromExisting(this._contractCode, order);
+
+    this.long =
+	Long
+		.fromExisting(
+			this._contractCode,
+			order
+		);
 
     if (this.long.state === PositionState.OPEN && !this.long.stopLossOrder) {
       await this.long.placeStopLoss(initialStopLoss);
@@ -155,24 +189,44 @@ export class Trader {
     log("");
   }
 
-  async openShort(price: number, volume: number) {
-    const stopLoss = calculateStopLoss(
-      price,
-      SHORT_STOP_LOSS_DEVIATION,
-      this._pricePrecision
-    );
-    this.short = new Short(this._contractCode, price, volume, stopLoss);
+  	async openShort(
+		price: number,
+		volume: number
+	) {
+	const stopLoss = calculateStopLoss(
+      		price,
+      		SHORT_STOP_LOSS_DEVIATION,
+      		this._pricePrecision
+    	);
+    this.short = new Short(
+		this._contractCode,
+		price,
+		volume,
+		stopLoss
+	);
+
     await this.short.open();
   }
 
-  async openLong(price: number, amount: number) {
-    const stopLoss = calculateStopLoss(
-      price,
-      LONG_STOP_LOSS_DEVIATION,
-      this._pricePrecision
-    );
-    this.long = new Long(this._contractCode, price, amount, stopLoss);
-    await this.long.open();
+  async openLong(
+		price: number,
+		amount: number
+	) {
+	const stopLoss = calculateStopLoss(
+      		price,
+      		LONG_STOP_LOSS_DEVIATION,
+      		this._pricePrecision
+    	);
+
+	this.long =
+		new Long(
+			this._contractCode,
+			price,
+			amount,
+			stopLoss
+		);
+
+	await this.long.open();
   }
 
   async openPositions(
@@ -180,15 +234,26 @@ export class Trader {
     marginAvailable: number,
     contractSize: number
   ) {
-    const volume = calculateEqualVolume(price, marginAvailable, contractSize);
+    const volume =
+	calculateEqualVolume(
+		price,
+		marginAvailable,
+		contractSize
+	);
 
-    const openShortPromise = this.openShort(price, volume);
-    const openLongPromise = this.openLong(price, volume);
+    const openShortPromise
+	= this.openShort(price, volume);
+    const openLongPromise
+	= this.openLong(price, volume);
 
     log(
       `${this._contractCode} trader opens new positions at ${price} of ${volume} volume`
     );
-    await Promise.all([openLongPromise, openShortPromise]);
+
+    await Promise.all([
+		openLongPromise,
+		openShortPromise
+	]);
   }
 
   async handleAllPositionsAreClosed() {
@@ -213,20 +278,41 @@ export class Trader {
     }
 
     const latestPrice = this.getLatestPrice();
-    await cancelAllStopLossTakeProfit({ contract_code: this._contractCode });
-    await this.openPositions(latestPrice, margin_available, contract_size);
+    await cancelAllStopLossTakeProfit(
+		{
+			contract_code:
+				this._contractCode
+		}
+	);
+
+    await this.openPositions(
+		latestPrice,
+		margin_available,
+		contract_size
+	);
   }
 
-  async handlePriceChange(latestPrice: number) {
-    await this.updateStopLossesBasedOnPrice(latestPrice);
+  	async handlePriceChange(
+		latestPrice: number
+	) {
+
+	await this.updateStopLossesBasedOnPrice(
+		latestPrice
+	);
   }
 
-  async handleOrderUpdate(order: OrderNotification) {
-    log(`${this._contractCode} order is updated`, order);
-    const longCheckPromise = this.long?.checkOrderUpdate(order);
-    const shortCheckPromise = this.short?.checkOrderUpdate(order);
+  	async handleOrderUpdate(
+		order: OrderNotification
+	) {
+    		log(`${this._contractCode} order is updated`, order);
+    	const longCheckPromise = this.long?.checkOrderUpdate(order);
 
-    await Promise.all([longCheckPromise, shortCheckPromise]);
+	const shortCheckPromise = this.short?.checkOrderUpdate(order);
+
+    await Promise.all([
+		longCheckPromise,
+		shortCheckPromise
+	]);
 
     const shortIsClosedOrNotExists = !this.short || this.short.isClosed();
     const longIsClosedOrNotExists = !this.long || this.long.isClosed();
@@ -241,7 +327,8 @@ export class Trader {
     }
   }
 
-  private async updateStopLossesBasedOnPrice(price: number) {
+  private async
+	updateStopLossesBasedOnPrice(price: number) {
     if (this.long && this.long.isOpen()) {
       const currentPriceDeviation = calculatePercentageDifference(
         this.long.entryPrice,
